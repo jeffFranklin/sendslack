@@ -13,11 +13,8 @@ import os
 import argparse
 
 
-def send(url, channel=None, username=None,
-         icon=None, message=None, infile=None):
+def send(url, message, channel=None, username=None, icon=None):
     """Send a message to a channel via incoming webhook url."""
-    if infile:
-        message = infile.read().strip()
     data = dict(channel=channel, username=username, text=message,
                 icon_emoji=icon)
     requests.post(url, json=data)
@@ -42,7 +39,10 @@ if __name__ == '__main__':
         url = args.pop('url') or os.environ.get('SLACK_URL')
         if not url:
             raise ValueError('no SLACK_URL set')
-        send(url, **args)
+        infile, message = args.pop('infile'), args.pop('message')
+        if infile:
+            message = infile.read().strip()
+        send(url, message, **args)
     except Exception as e:
         print('error: ' + str(e), file=sys.stderr)
         sys.exit(1)
