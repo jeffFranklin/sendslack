@@ -17,7 +17,9 @@ def send(url, message, channel=None, username=None, icon=None):
     """Send a message to a channel via incoming webhook url."""
     data = dict(channel=channel, username=username, text=message,
                 icon_emoji=icon)
-    requests.post(url, json=data)
+    response = requests.post(url, json=data)
+    if response.status_code != 200:
+        raise Exception('slack failed to send: ' + str(response.content))
 
 
 def arg_parser():
